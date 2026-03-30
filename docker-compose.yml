@@ -1,0 +1,15 @@
+services:
+  spotiflac-ui:
+    build: .
+    container_name: spotiflac-ui
+    ports:
+      - "7171:7171"
+    environment:
+      # Get these free from developer.spotify.com (needed for search + cover art only)
+      - SPOTIFY_CLIENT_ID=adbcd346a87a4fdeb07ad5021abfdd7a
+      - SPOTIFY_CLIENT_SECRET=f3dc182a00ef483da39320971fddf8a0
+      # Where to save downloaded music
+      - DOWNLOAD_DIR=/downloads
+    volumes:
+      - /mnt/rpi5-hdd/music:/downloads
+    restart: unless-stopped
