@@ -1,6 +1,6 @@
 services:
   spotiflac-ui:
-    build: .
+    image: ghcr.io/sidcancode/spotiflac-webui:latest
     container_name: spotiflac-ui
     ports:
       - "7171:7171"
