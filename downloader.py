@@ -446,7 +446,7 @@ def embed_metadata(filepath, meta, cover_url=None):
 
 # ── Main entry point ──────────────────────────────────────────────────────────
 
-def download_track(isrc, output_dir, spotify_meta, services=None, progress_cb=None):
+def download_track(isrc, output_dir, spotify_meta, services=None, progress_cb=None, filename_format=None):
     """
     Download a track. spotify_meta must contain:
     title, artist, album, album_artist, release_date, cover_url,
@@ -459,7 +459,20 @@ def download_track(isrc, output_dir, spotify_meta, services=None, progress_cb=No
     title = sanitize(spotify_meta.get("title", "Unknown"))
     artist = sanitize(spotify_meta.get("artist", "Unknown"))
     track_num = int(spotify_meta.get("track_number") or 1)
-    filename = f"{track_num:02d} - {title}.flac"
+    # Build filename from format string
+    if not filename_format:
+        filename_format = "{track_number} - {title}"
+    filename = (filename_format
+        .replace("{title}", title)
+        .replace("{artist}", artist)
+        .replace("{album}", sanitize(spotify_meta.get("album", "")))
+        .replace("{album_artist}", sanitize(spotify_meta.get("album_artist", "")))
+        .replace("{track_number}", f"{track_num:02d}")
+        .replace("{disc_number}", str(spotify_meta.get("disc_number", 1)))
+        .replace("{year}", (spotify_meta.get("release_date") or "")[:4])
+        .replace("{isrc}", isrc or "")
+    ) + ".flac"
+    filename = sanitize(filename, fallback="track.flac")
     filepath = os.path.join(output_dir, filename)
 
     log.info(f"\n{'='*60}")
